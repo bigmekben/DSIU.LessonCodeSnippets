@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerLocomotion : MonoBehaviour
@@ -10,6 +11,8 @@ public class PlayerLocomotion : MonoBehaviour
     public Transform myTransform;
 
     Vector3 normalVector;
+    [HideInInspector]
+    public AnimatorHandler animatorHandler;
     public new Rigidbody rigidbody;
     public GameObject normalCamera;
 
@@ -22,10 +25,12 @@ public class PlayerLocomotion : MonoBehaviour
 
     void Start()
     {
+        animatorHandler = GetComponentInChildren<AnimatorHandler>();
         rigidbody = GetComponent<Rigidbody>();
         inputHandler = GetComponent<InputHandler>();
         cameraObject = Camera.main.transform;
         myTransform = transform;
+        animatorHandler.Initialize();
     }
 
     public void Update()
@@ -44,6 +49,12 @@ public class PlayerLocomotion : MonoBehaviour
         Vector3 projectedVelocity = Vector3.ProjectOnPlane(moveDirection, normalVector);
         rigidbody.velocity = projectedVelocity;
 
+        animatorHandler.UpdateAnimatorValues(inputHandler.moveAmount, 0);
+        
+        if (animatorHandler.canRotate)
+        {
+            HandleRotation(delta);
+        }
     }
 
     #region Movement
